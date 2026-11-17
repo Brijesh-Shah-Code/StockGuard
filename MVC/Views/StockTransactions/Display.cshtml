@@ -1,0 +1,106 @@
+@model MVC.Models.StockTransactions
+
+@{
+    ViewData["Title"] = "Transaction Details - #" + Model.TransactionId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">Transaction Details</h1>
+                <p class="text-muted mb-0">Audit record for stock movement entry #@Model.TransactionId</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Log
+                </a>
+                <a asp-action="ProductHistory" asp-route-productId="@Model.ProductId" class="btn btn-outline-primary">
+                    <i class="bi bi-clock-history me-1"></i> Product History
+                </a>
+            </div>
+        </div>
+
+        <!-- Detail Card -->
+        <div class="sg-card">
+            <div class="sg-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="sg-kpi-icon @(Model.TransactionType == "IN" ? "success" : Model.TransactionType == "OUT" ? "danger" : "warning")" style="width: 38px; height: 38px; font-size: 1.15rem;">
+                        <i class="bi @(Model.TransactionType == "IN" ? "bi-box-arrow-in-down" : Model.TransactionType == "OUT" ? "bi-box-arrow-up" : "bi-sliders")"></i>
+                    </div>
+                    <div>
+                        <h2 class="sg-card-title mb-0">Record #@Model.TransactionId</h2>
+                    </div>
+                </div>
+
+                @if (Model.TransactionType == "IN")
+                {
+                    <span class="sg-badge sg-badge-success fs-6">
+                        <span class="sg-badge-dot"></span> Stock Intake (IN)
+                    </span>
+                }
+                else if (Model.TransactionType == "OUT")
+                {
+                    <span class="sg-badge sg-badge-danger fs-6">
+                        <span class="sg-badge-dot"></span> Stock Fulfillment (OUT)
+                    </span>
+                }
+                else
+                {
+                    <span class="sg-badge sg-badge-warning fs-6">
+                        <span class="sg-badge-dot"></span> Inventory Adjustment
+                    </span>
+                }
+            </div>
+
+            <div class="sg-card-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Impacted Product</label>
+                        <div class="p-3 rounded-3 bg-light d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-bold text-dark fs-5">@Model.ProductName</div>
+                                <span class="sg-sku-pill">@Model.ProductSKU</span>
+                            </div>
+                            <a asp-controller="Products" asp-action="Display" asp-route-productId="@Model.ProductId" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-box-seam me-1"></i> Product Details
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Quantity Moved / Set</label>
+                        <div class="fs-4 fw-bold @(Model.TransactionType == "IN" ? "text-success" : Model.TransactionType == "OUT" ? "text-danger" : "text-dark")">
+                            @(Model.TransactionType == "IN" ? "+" : Model.TransactionType == "OUT" ? "-" : "")@Model.Quantity units
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Transaction Timestamp</label>
+                        <div class="text-dark fs-6 fw-semibold">
+                            <i class="bi bi-calendar-event me-1 text-primary"></i>
+                            @Model.TransactionDate.ToString("MMMM dd, yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Remarks / Reference</label>
+                        <div class="p-3 rounded-3 bg-light text-muted">
+                            @(string.IsNullOrWhiteSpace(Model.Remarks) ? "No remarks provided for this transaction." : Model.Remarks)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.TransactionType != "ADJUSTMENT")
+            {
+                <div class="sg-card-footer d-flex justify-content-end">
+                    <a asp-action="Delete" asp-route-transactionId="@Model.TransactionId" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i> Reverse Transaction
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

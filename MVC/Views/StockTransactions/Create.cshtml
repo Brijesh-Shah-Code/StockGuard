@@ -1,0 +1,143 @@
+@model MVC.Models.StockTransactions
+
+@{
+    ViewData["Title"] = "Record Stock Transaction";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">Record Stock Movement</h1>
+                <p class="text-muted mb-0">Post intake, fulfillment, or physical audit adjustments to inventory.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Log
+            </a>
+        </div>
+
+        <!-- Guide Banner -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle h-100">
+                    <div class="fw-bold text-success mb-1">
+                        <i class="bi bi-arrow-down-left-circle-fill me-1"></i> IN (Intake)
+                    </div>
+                    <small class="text-success-emphasis d-block">
+                        Increases available stock by the entered quantity.
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle h-100">
+                    <div class="fw-bold text-danger mb-1">
+                        <i class="bi bi-arrow-up-right-circle-fill me-1"></i> OUT (Fulfillment)
+                    </div>
+                    <small class="text-danger-emphasis d-block">
+                        Decreases stock by the entered quantity (requires sufficient stock).
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle h-100">
+                    <div class="fw-bold text-warning-emphasis mb-1">
+                        <i class="bi bi-sliders me-1"></i> ADJUSTMENT
+                    </div>
+                    <small class="text-warning-emphasis d-block">
+                        Overrides stock level directly to the exact count entered.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="sg-card">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-arrow-left-right text-primary"></i>
+                    <span>Transaction Entry Form</span>
+                </h2>
+            </div>
+
+            <div class="sg-card-body">
+                <form asp-action="Create" method="post" novalidate>
+                    <div asp-validation-summary="All" class="alert alert-danger py-2 small mb-4" style="display:none;"></div>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="sg-alert sg-alert-danger alert alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                            <div>@ViewBag.ErrorMessage</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-7">
+                            <label asp-for="ProductId" class="form-label">Target Product <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                                <select asp-for="ProductId" class="form-select" asp-items="ViewBag.Products" required>
+                                    <option value="">-- Select Product & SKU --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="ProductId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label asp-for="TransactionType" class="form-label">Movement Type <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-arrow-left-right"></i></span>
+                                <select asp-for="TransactionType" class="form-select" asp-items="ViewBag.TransactionTypes" required>
+                                    <option value="">-- Choose Type --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="TransactionType" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-123"></i></span>
+                                <input asp-for="Quantity" type="number" min="1" class="form-control" placeholder="Enter units" required />
+                            </div>
+                            <span asp-validation-for="Quantity" class="text-danger small"></span>
+                            <div class="form-text small text-muted">
+                                For IN/OUT: Units to add/remove. For ADJUSTMENT: Target count.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="TransactionDate" class="form-label">Effective Date & Time <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="TransactionDate" type="datetime-local" class="form-control" value="@Model.TransactionDate.ToString("yyyy-MM-ddTHH:mm")" required />
+                            </div>
+                            <span asp-validation-for="TransactionDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Remarks" class="form-label">Audit Remarks / Purchase Order / Reference</label>
+                        <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Optional notes, PO reference number, carrier details..." maxlength="300"></textarea>
+                        <span asp-validation-for="Remarks" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-1"></i> Post Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

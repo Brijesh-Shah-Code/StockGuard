@@ -1,0 +1,36 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5">
+            <div class="mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 80px; height: 80px;">
+                    <i class="bi bi-exclamation-octagon-fill fs-1"></i>
+                </span>
+            </div>
+            <h1 class="h3 fw-bold text-dark mb-2">Something went wrong</h1>
+            <p class="text-muted mb-4">
+                An error occurred while processing your request. Our system has logged the event and our team is notified.
+            </p>
+
+            @if (Model != null && Model.ShowRequestId)
+            {
+                <div class="alert alert-light border text-muted py-2 px-3 d-inline-block small mb-4">
+                    <strong>Request ID:</strong> <code class="text-primary">@Model.RequestId</code>
+                </div>
+            }
+
+            <div class="d-flex justify-content-center gap-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2 rounded-pill">
+                    <i class="bi bi-house-door me-1"></i> Back to Dashboard
+                </a>
+                <button type="button" onclick="history.back()" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<!-- Use inline styles to force the container to ignore your site's global CSS -->
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px;">
+    
+    <!-- Force width to 100% up to a max of 600px -->
+    <div class="card shadow-sm border-0 rounded-4 text-center" style="width: 100%; max-width: 600px; padding: 3rem;">
+        
+        <div class="mb-4">
+            <span class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 80px; height: 80px;">
+                <i class="bi bi-shield-lock-fill fs-1"></i>
+            </span>
+        </div>
+        
+        <h1 class="h3 fw-bold text-dark mb-3" style="white-space: nowrap;">Access Denied</h1>
+        
+        <!-- Added min-width to ensure text wraps naturally, not word-by-word -->
+        <p class="text-muted mb-4" style="font-size: 1.1rem; line-height: 1.6; min-width: 250px;">
+            You do not have the required administrative permissions to access this page or perform this operation.
+        </p>
+        
+        <!-- Flex layout to stack buttons on small screens -->
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-2">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2 rounded-pill">
+                <i class="bi bi-house-door me-1"></i> Return to Dashboard
+            </a>
+            <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                <i class="bi bi-box-arrow-right me-1"></i> Switch Account
+            </a>
+        </div>
+        
+    </div>
+</div>

@@ -1,0 +1,123 @@
+@model IEnumerable<MVC.Models.Categories>
+
+@{
+    ViewData["Title"] = "Categories";
+    var categoryList = Model?.ToList() ?? new List<MVC.Models.Categories>();
+}
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Product Categories</h1>
+        <p class="text-muted mb-0">Organize your inventory catalog into structured taxonomy groups.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle-fill"></i> Add Category
+        </a>
+    </div>
+</div>
+
+<!-- Table Container & Toolbar -->
+<div class="sg-table-container">
+    <div class="sg-table-toolbar">
+        <div class="sg-table-search">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Search categories..." data-sg-table-search="categoriesTable" />
+            <button type="button" class="clear-search" aria-label="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm w-auto" data-sg-table-filter="categoriesTable" data-sg-filter-col="2">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+        <table class="sg-table" id="categoriesTable">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!categoryList.Any())
+                {
+                    <tr class="no-records-row">
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-tags fs-1 d-block mb-2 opacity-50"></i>
+                            <p class="mb-3">No categories defined yet.</p>
+                            <a asp-action="Create" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Create First Category
+                            </a>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in categoryList)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sg-kpi-icon primary" style="width: 34px; height: 34px; font-size: 1rem;">
+                                        <i class="bi bi-tag-fill"></i>
+                                    </div>
+                                    <span class="fw-semibold text-dark">@item.CategoryName</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-muted">
+                                    @(string.IsNullOrWhiteSpace(item.Description) ? "—" : item.Description)
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (item.IsActive)
+                                {
+                                    <span class="sg-badge sg-badge-success">
+                                        <span class="sg-badge-dot"></span> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="sg-badge sg-badge-slate">
+                                        <span class="sg-badge-dot"></span> Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Display" asp-route-categoryId="@item.CategoryId" class="btn btn-outline-secondary" title="View Category">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Update" asp-route-categoryId="@item.CategoryId" class="btn btn-outline-secondary" title="Edit Category">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-categoryId="@item.CategoryId" class="btn btn-outline-danger" title="Delete Category">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div class="sg-table-pagination">
+        <span data-sg-count-for="categoriesTable">
+            Total @categoryList.Count categories configured
+        </span>
+    </div>
+</div>

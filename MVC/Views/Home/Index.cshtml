@@ -1,0 +1,260 @@
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Dashboard";
+    var recentTransactions = ViewBag.RecentTransactions as List<MVC.Models.StockTransactions> ?? new List<MVC.Models.StockTransactions>();
+    var userRole = ViewBag.UserRole as string ?? User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+    var userName = ViewBag.UserName as string ?? User.Identity?.Name ?? "User";
+    var isAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
+    var lowStockCount = (int)(ViewBag.LowStockCount ?? 0);
+}
+
+<!-- Welcome Section -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">
+            Welcome, @userName! 👋
+        </h1>
+        <p class="text-muted mb-0">Here is your live inventory status, transaction trends, and stock movements.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-controller="StockTransactions" asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-arrow-down-up"></i> Record Movement
+        </a>
+        @if (isAdmin)
+        {
+            <a asp-controller="Products" asp-action="Create" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i> Add Product
+            </a>
+        }
+    </div>
+</div>
+
+<!-- 4 Key Performance Metric Cards -->
+<div class="row g-3 mb-4">
+    <!-- Products -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="sg-kpi-card">
+            <div class="sg-kpi-content">
+                <div class="sg-kpi-label">Total Products</div>
+                <h3 class="sg-kpi-value">@(ViewBag.ProductCount ?? 0)</h3>
+                <div class="sg-kpi-meta text-muted">
+                    <i class="bi bi-box-seam me-1 text-primary"></i> Active Catalog
+                </div>
+            </div>
+            <div class="sg-kpi-icon primary">
+                <i class="bi bi-box-seam-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="sg-kpi-card @(lowStockCount > 0 ? "border-danger-subtle" : "")">
+            <div class="sg-kpi-content">
+                <div class="sg-kpi-label">Low Stock Items</div>
+                <h3 class="sg-kpi-value @(lowStockCount > 0 ? "text-danger" : "")">@lowStockCount</h3>
+                <div class="sg-kpi-meta">
+                    @if (lowStockCount > 0)
+                    {
+                        <span class="sg-badge sg-badge-danger">
+                            <span class="sg-badge-dot"></span> Action Required
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="sg-badge sg-badge-success">
+                            <span class="sg-badge-dot"></span> All Healthy
+                        </span>
+                    }
+                </div>
+            </div>
+            <div class="sg-kpi-icon @(lowStockCount > 0 ? "danger" : "success")">
+                <i class="bi @(lowStockCount > 0 ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill")"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="sg-kpi-card">
+            <div class="sg-kpi-content">
+                <div class="sg-kpi-label">Categories</div>
+                <h3 class="sg-kpi-value">@(ViewBag.CategoryCount ?? 0)</h3>
+                <div class="sg-kpi-meta text-muted">
+                    <i class="bi bi-tags me-1 text-info"></i> Product Groups
+                </div>
+            </div>
+            <div class="sg-kpi-icon info">
+                <i class="bi bi-tags-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suppliers -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="sg-kpi-card">
+            <div class="sg-kpi-content">
+                <div class="sg-kpi-label">Active Suppliers</div>
+                <h3 class="sg-kpi-value">@(ViewBag.SupplierCount ?? 0)</h3>
+                <div class="sg-kpi-meta text-muted">
+                    <i class="bi bi-truck me-1 text-success"></i> Partner Vendors
+                </div>
+            </div>
+            <div class="sg-kpi-icon success">
+                <i class="bi bi-truck-front-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="row g-4">
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+        <div class="sg-card h-100">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i>
+                    <span>Quick Operations</span>
+                </h2>
+            </div>
+            <div class="sg-card-body d-flex flex-column gap-3">
+                <a asp-controller="StockTransactions" asp-action="Create" class="p-3 border rounded-3 text-decoration-none d-flex align-items-center gap-3 transition-all hover-bg-light">
+                    <div class="sg-kpi-icon primary" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold text-dark">Record Stock Transaction</div>
+                        <small class="text-muted">Inbound intake, outbound shipment, or audit adjustment</small>
+                    </div>
+                </a>
+
+                @if (isAdmin)
+                {
+                    <a asp-controller="Products" asp-action="Create" class="p-3 border rounded-3 text-decoration-none d-flex align-items-center gap-3 transition-all hover-bg-light">
+                        <div class="sg-kpi-icon info" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-dark">Add New Product</div>
+                            <small class="text-muted">Register SKU, unit price, and initial inventory</small>
+                        </div>
+                    </a>
+
+                    <a asp-controller="Categories" asp-action="Create" class="p-3 border rounded-3 text-decoration-none d-flex align-items-center gap-3 transition-all hover-bg-light">
+                        <div class="sg-kpi-icon warning" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                            <i class="bi bi-tag-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-dark">Create Category</div>
+                            <small class="text-muted">Organize your warehouse items logically</small>
+                        </div>
+                    </a>
+
+                    <a asp-controller="Suppliers" asp-action="Create" class="p-3 border rounded-3 text-decoration-none d-flex align-items-center gap-3 transition-all hover-bg-light">
+                        <div class="sg-kpi-icon success" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-dark">Add Supplier</div>
+                            <small class="text-muted">Keep vendor contact details up to date</small>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <div class="p-3 rounded-3 bg-light text-muted small">
+                        <i class="bi bi-info-circle me-1"></i> As a staff operator, you can execute stock transactions and review product movement history.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Stock Transactions Feed -->
+    <div class="col-lg-8">
+        <div class="sg-card h-100">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-clock-history text-primary"></i>
+                    <span>Recent Stock Movements</span>
+                </h2>
+                <a asp-controller="StockTransactions" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                    View All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="sg-card-body p-0">
+                @if (recentTransactions.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="sg-table">
+                            <thead>
+                                <tr>
+                                    <th>Product & SKU</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Date & Time</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var t in recentTransactions)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold text-dark">@t.ProductName</div>
+                                            <span class="sg-sku-pill">@t.ProductSKU</span>
+                                        </td>
+                                        <td>
+                                            @if (t.TransactionType == "IN")
+                                            {
+                                                <span class="sg-badge sg-badge-success">
+                                                    <span class="sg-badge-dot"></span> IN
+                                                </span>
+                                            }
+                                            else if (t.TransactionType == "OUT")
+                                            {
+                                                <span class="sg-badge sg-badge-danger">
+                                                    <span class="sg-badge-dot"></span> OUT
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="sg-badge sg-badge-warning">
+                                                    <span class="sg-badge-dot"></span> ADJUSTMENT
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold @(t.TransactionType == "IN" ? "text-success" : t.TransactionType == "OUT" ? "text-danger" : "text-dark")">
+                                                @(t.TransactionType == "IN" ? "+" : t.TransactionType == "OUT" ? "-" : "")@t.Quantity
+                                            </span>
+                                        </td>
+                                        <td class="text-muted small">
+                                            @t.TransactionDate.ToString("MMM dd, yyyy HH:mm")
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="StockTransactions" asp-action="Display" asp-route-transactionId="@t.TransactionId" class="btn btn-sm btn-outline-secondary btn-icon" title="View details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                        <p class="mb-3">No stock transactions recorded yet.</p>
+                        <a asp-controller="StockTransactions" asp-action="Create" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-lg me-1"></i> Record First Movement
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

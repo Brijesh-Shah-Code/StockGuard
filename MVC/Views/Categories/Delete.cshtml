@@ -1,0 +1,60 @@
+@model MVC.Models.Categories
+
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <!-- Delete Confirmation Card -->
+        <div class="sg-card border-danger-subtle">
+            <div class="sg-card-header bg-danger-subtle text-danger border-danger-subtle">
+                <h2 class="sg-card-title text-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>Confirm Category Deletion</span>
+                </h2>
+            </div>
+
+            <div class="sg-card-body">
+                <div class="text-center my-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle mb-3" style="width: 64px; height: 64px;">
+                        <i class="bi bi-trash3-fill fs-2"></i>
+                    </span>
+                    <h3 class="h5 fw-bold text-dark mb-1">Delete category "@Model.CategoryName"?</h3>
+                    <p class="text-muted small">
+                        Categories assigned to active products may restrict deletion. Please verify that products in this category have been reassigned.
+                    </p>
+                </div>
+
+                <div class="p-3 rounded-3 bg-light border mb-4">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted small">Category Name:</span>
+                        <span class="fw-semibold text-dark">@Model.CategoryName</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted small">Description:</span>
+                        <span class="text-muted">@(string.IsNullOrWhiteSpace(Model.Description) ? "None" : Model.Description)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <span class="text-muted small">Status:</span>
+                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="CategoryId" />
+                    <div class="d-flex align-items-center justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-1"></i> Delete Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

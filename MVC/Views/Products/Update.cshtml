@@ -1,0 +1,164 @@
+@model MVC.Models.Products
+
+@{
+    ViewData["Title"] = "Update Product";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">Update Product</h1>
+                <p class="text-muted mb-0">Modify specifications, pricing, or thresholds for <strong>@Model.ProductName</strong></p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Catalog
+            </a>
+        </div>
+
+        <!-- Form Card -->
+        <div class="sg-card">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-pencil-square text-primary"></i>
+                    <span>Edit Specifications (ID: #@Model.ProductId)</span>
+                </h2>
+                <span class="sg-sku-pill">@Model.SKU</span>
+            </div>
+
+            <div class="sg-card-body">
+                <form asp-action="Update" method="post" novalidate>
+                    <input type="hidden" asp-for="ProductId" />
+                    <div asp-validation-summary="All" class="alert alert-danger py-2 small mb-4" style="display:none;"></div>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="sg-alert sg-alert-danger alert alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                            <div>@ViewBag.ErrorMessage</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <!-- Section: General Information -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3">
+                        <i class="bi bi-info-circle me-1"></i> General Information
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-5">
+                            <label asp-for="SKU" class="form-label">SKU / Item Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                                <input asp-for="SKU" class="form-control" maxlength="50" required />
+                            </div>
+                            <span asp-validation-for="SKU" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-7">
+                            <label asp-for="ProductName" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <input asp-for="ProductName" class="form-control" maxlength="150" required />
+                            </div>
+                            <span asp-validation-for="ProductName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide product details, specifications, or notes..." maxlength="500"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted opacity-25" />
+
+                    <!-- Section: Classification -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3">
+                        <i class="bi bi-diagram-3 me-1"></i> Organization & Sourcing
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="CategoryId" class="form-label">Category <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories" required>
+                                    <option value="">-- Choose Category --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SupplierId" class="form-label">Supplier <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-truck"></i></span>
+                                <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.Suppliers" required>
+                                    <option value="">-- Choose Supplier --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="SupplierId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted opacity-25" />
+
+                    <!-- Section: Pricing & Stock Levels -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3">
+                        <i class="bi bi-currency-dollar me-1"></i> Pricing & Inventory Thresholds
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="UnitPrice" class="form-label">Unit Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="UnitPrice" type="number" step="0.01" min="0" class="form-control" required />
+                            </div>
+                            <span asp-validation-for="UnitPrice" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="StockQuantity" class="form-label">Stock Quantity <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-boxes"></i></span>
+                                <input asp-for="StockQuantity" type="number" min="0" class="form-control" required />
+                            </div>
+                            <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="MinStockLevel" class="form-label">Minimum Level <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-bell"></i></span>
+                                <input asp-for="MinStockLevel" type="number" min="0" class="form-control" required />
+                            </div>
+                            <span asp-validation-for="MinStockLevel" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted opacity-25" />
+
+                    <!-- Status Switch -->
+                    <div class="form-check form-switch mb-4">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="updateProductIsActiveSwitch" />
+                        <label class="form-check-label fw-semibold" for="updateProductIsActiveSwitch">
+                            Active in Catalog (Available for transactions)
+                        </label>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-1"></i> Update Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

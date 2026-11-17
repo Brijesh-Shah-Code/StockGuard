@@ -1,0 +1,161 @@
+@model MVC.Models.Products
+
+@{
+    ViewData["Title"] = "Product Details - " + Model.ProductName;
+    var isLowStock = Model.StockQuantity <= Model.MinStockLevel;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h1 class="h3 fw-bold text-dark mb-0">@Model.ProductName</h1>
+                    <span class="sg-sku-pill">@Model.SKU</span>
+                    @if (Model.IsActive)
+                    {
+                        <span class="sg-badge sg-badge-success">
+                            <span class="sg-badge-dot"></span> Active
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="sg-badge sg-badge-slate">
+                            <span class="sg-badge-dot"></span> Inactive
+                        </span>
+                    }
+                </div>
+                <p class="text-muted mb-0">Product details, inventory status, and vendor association.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Catalog
+                </a>
+                <a asp-controller="StockTransactions" asp-action="ProductHistory" asp-route-productId="@Model.ProductId" class="btn btn-outline-primary">
+                    <i class="bi bi-clock-history me-1"></i> Movement History
+                </a>
+                <a asp-action="Update" asp-route-productId="@Model.ProductId" class="btn btn-primary">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric KPI Cards for this product -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="sg-kpi-card @(isLowStock ? "border-danger-subtle" : "")">
+                    <div class="sg-kpi-content">
+                        <div class="sg-kpi-label">Current Stock</div>
+                        <h3 class="sg-kpi-value @(isLowStock ? "text-danger" : "")">@Model.StockQuantity</h3>
+                        <div class="sg-kpi-meta">
+                            @if (isLowStock)
+                            {
+                                <span class="sg-badge sg-badge-danger">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Low Stock
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="sg-badge sg-badge-success">
+                                    <span class="sg-badge-dot"></span> In Stock
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="sg-kpi-icon @(isLowStock ? "danger" : "primary")">
+                        <i class="bi bi-boxes"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="sg-kpi-card">
+                    <div class="sg-kpi-content">
+                        <div class="sg-kpi-label">Unit Price</div>
+                        <h3 class="sg-kpi-value">@Model.UnitPrice.ToString("C")</h3>
+                        <div class="sg-kpi-meta text-muted">
+                            <i class="bi bi-tag me-1"></i> Standard Retail
+                        </div>
+                    </div>
+                    <div class="sg-kpi-icon success">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="sg-kpi-card">
+                    <div class="sg-kpi-content">
+                        <div class="sg-kpi-label">Min Threshold</div>
+                        <h3 class="sg-kpi-value">@Model.MinStockLevel</h3>
+                        <div class="sg-kpi-meta text-muted">
+                            <i class="bi bi-bell me-1"></i> Reorder Point
+                        </div>
+                    </div>
+                    <div class="sg-kpi-icon warning">
+                        <i class="bi bi-shield-exclamation"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Specifications Card -->
+        <div class="sg-card">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    <span>Product Specifications</span>
+                </h2>
+            </div>
+            <div class="sg-card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Category</label>
+                        <div class="fw-semibold text-dark fs-6">
+                            <i class="bi bi-tags me-1 text-primary"></i>
+                            @(Model.CategoryName ?? "Not Assigned")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Supplier / Vendor</label>
+                        <div class="fw-semibold text-dark fs-6">
+                            <i class="bi bi-truck me-1 text-success"></i>
+                            @(Model.SupplierName ?? "Not Assigned")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Description</label>
+                        <div class="p-3 rounded-3 bg-light text-dark">
+                            @(string.IsNullOrWhiteSpace(Model.Description) ? "No description provided for this product." : Model.Description)
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Created At</label>
+                        <div class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            @Model.CreatedAt.ToString("MMMM dd, yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block mb-1">Last Modified</label>
+                        <div class="text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            @(Model.UpdatedAt != DateTime.MinValue ? Model.UpdatedAt.ToString("MMMM dd, yyyy HH:mm") : "Never modified")
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sg-card-footer d-flex justify-content-between align-items-center">
+                <span class="text-muted small">System ID: #@Model.ProductId</span>
+                <a asp-action="Delete" asp-route-productId="@Model.ProductId" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i> Delete Product
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

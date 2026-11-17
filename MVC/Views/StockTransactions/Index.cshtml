@@ -1,0 +1,140 @@
+@model IEnumerable<MVC.Models.StockTransactions>
+
+@{
+    ViewData["Title"] = "Stock Transactions";
+    var transactionList = Model?.ToList() ?? new List<MVC.Models.StockTransactions>();
+}
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Stock Movement Log</h1>
+        <p class="text-muted mb-0">Audit history of intake shipments, customer fulfillment, and inventory adjustments.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-arrow-down-up"></i> Record Movement
+        </a>
+    </div>
+</div>
+
+<!-- Table Container & Toolbar -->
+<div class="sg-table-container">
+    <div class="sg-table-toolbar">
+        <div class="sg-table-search">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Search by product, SKU, remarks..." data-sg-table-search="transactionsTable" />
+            <button type="button" class="clear-search" aria-label="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm w-auto" data-sg-table-filter="transactionsTable" data-sg-filter-col="2">
+                <option value="">All Movement Types</option>
+                <option value="IN">IN (Stock Intake)</option>
+                <option value="OUT">OUT (Fulfillment)</option>
+                <option value="ADJUSTMENT">ADJUSTMENT (Audit)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+        <table class="sg-table" id="transactionsTable">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Product & SKU</th>
+                    <th>Movement Type</th>
+                    <th class="text-end">Quantity</th>
+                    <th>Date & Time</th>
+                    <th>Remarks</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!transactionList.Any())
+                {
+                    <tr class="no-records-row">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-clock-history fs-1 d-block mb-2 opacity-50"></i>
+                            <p class="mb-3">No stock transactions found.</p>
+                            <a asp-action="Create" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Record First Movement
+                            </a>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in transactionList)
+                    {
+                        <tr>
+                            <td class="text-muted fw-mono small">
+                                #@item.TransactionId
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.ProductName</div>
+                                <span class="sg-sku-pill">@item.ProductSKU</span>
+                            </td>
+                            <td>
+                                @if (item.TransactionType == "IN")
+                                {
+                                    <span class="sg-badge sg-badge-success">
+                                        <span class="sg-badge-dot"></span> IN (Stock In)
+                                    </span>
+                                }
+                                else if (item.TransactionType == "OUT")
+                                {
+                                    <span class="sg-badge sg-badge-danger">
+                                        <span class="sg-badge-dot"></span> OUT (Stock Out)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="sg-badge sg-badge-warning">
+                                        <span class="sg-badge-dot"></span> ADJUSTMENT
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <span class="fw-bold @(item.TransactionType == "IN" ? "text-success" : item.TransactionType == "OUT" ? "text-danger" : "text-dark")">
+                                    @(item.TransactionType == "IN" ? "+" : item.TransactionType == "OUT" ? "-" : "")@item.Quantity
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                @item.TransactionDate.ToString("yyyy-MM-dd HH:mm")
+                            </td>
+                            <td>
+                                <span class="text-muted small">
+                                    @(string.IsNullOrWhiteSpace(item.Remarks) ? "—" : item.Remarks)
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Display" asp-route-transactionId="@item.TransactionId" class="btn btn-outline-secondary" title="View Transaction">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (item.TransactionType != "ADJUSTMENT")
+                                    {
+                                        <a asp-action="Delete" asp-route-transactionId="@item.TransactionId" class="btn btn-outline-danger" title="Reverse Transaction">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div class="sg-table-pagination">
+        <span data-sg-count-for="transactionsTable">
+            Total @transactionList.Count movements recorded
+        </span>
+    </div>
+</div>

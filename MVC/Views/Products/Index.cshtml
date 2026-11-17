@@ -1,0 +1,168 @@
+@model IEnumerable<MVC.Models.Products>
+
+@{
+    ViewData["Title"] = "Product Catalog";
+    var productList = Model?.ToList() ?? new List<MVC.Models.Products>();
+    var categories = productList.Select(p => p.CategoryName).Where(c => !string.IsNullOrEmpty(c)).Distinct().OrderBy(c => c).ToList();
+}
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Product Catalog</h1>
+        <p class="text-muted mb-0">Manage inventory items, SKUs, pricing, and reorder levels.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle-fill"></i> Add New Product
+        </a>
+    </div>
+</div>
+
+<!-- Table Container & Filter Toolbar -->
+<div class="sg-table-container">
+    <div class="sg-table-toolbar">
+        <!-- Live Instant Search -->
+        <div class="sg-table-search">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Search by name, SKU, category..." data-sg-table-search="productsTable" />
+            <button type="button" class="clear-search" aria-label="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+
+        <!-- Filter Dropdowns -->
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            @if (categories.Any())
+            {
+                <select class="form-select form-select-sm w-auto" data-sg-table-filter="productsTable" data-sg-filter-col="2">
+                    <option value="">All Categories</option>
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat">@cat</option>
+                    }
+                </select>
+            }
+
+            <select class="form-select form-select-sm w-auto" data-sg-table-filter="productsTable" data-sg-filter-col="6">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+        <table class="sg-table" id="productsTable">
+            <thead>
+                <tr>
+                    <th>Product & SKU</th>
+                    <th>Category</th>
+                    <th>Supplier</th>
+                    <th class="text-end">Unit Price</th>
+                    <th class="text-center">Stock Level</th>
+                    <th class="text-center">Min Level</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!productList.Any())
+                {
+                    <tr class="no-records-row">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-box-seam fs-1 d-block mb-2 opacity-50"></i>
+                            <p class="mb-3">No products found in the catalog.</p>
+                            <a asp-action="Create" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Add Your First Product
+                            </a>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in productList)
+                    {
+                        var isLowStock = item.StockQuantity <= item.MinStockLevel;
+                        <tr>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.ProductName</div>
+                                <span class="sg-sku-pill">@item.SKU</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    @(item.CategoryName ?? "Uncategorized")
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted small">
+                                    <i class="bi bi-truck me-1"></i>@(item.SupplierName ?? "None")
+                                </span>
+                            </td>
+                            <td class="text-end fw-semibold text-dark">
+                                @item.UnitPrice.ToString("C")
+                            </td>
+                            <td class="text-center">
+                                @if (isLowStock)
+                                {
+                                    <span class="sg-badge sg-badge-danger" title="Stock at or below minimum threshold!">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        <span>@item.StockQuantity</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="sg-badge sg-badge-success">
+                                        <span class="sg-badge-dot"></span>
+                                        <span>@item.StockQuantity</span>
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center text-muted small">
+                                @item.MinStockLevel
+                            </td>
+                            <td class="text-center">
+                                @if (item.IsActive)
+                                {
+                                    <span class="sg-badge sg-badge-success">
+                                        <span class="sg-badge-dot"></span> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="sg-badge sg-badge-slate">
+                                        <span class="sg-badge-dot"></span> Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Display" asp-route-productId="@item.ProductId" class="btn btn-outline-secondary" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-controller="StockTransactions" asp-action="ProductHistory" asp-route-productId="@item.ProductId" class="btn btn-outline-secondary" title="Movement History">
+                                        <i class="bi bi-clock-history"></i>
+                                    </a>
+                                    <a asp-action="Update" asp-route-productId="@item.ProductId" class="btn btn-outline-secondary" title="Edit Product">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-productId="@item.ProductId" class="btn btn-outline-danger" title="Delete Product">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Table Footer / Count -->
+    <div class="sg-table-pagination">
+        <span data-sg-count-for="productsTable">
+            Total @productList.Count products listed
+        </span>
+    </div>
+</div>

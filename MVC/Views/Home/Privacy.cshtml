@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Privacy & Security Policy";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">Privacy & Data Governance</h1>
+                <p class="text-muted mb-0">Compliance, data security, and encryption standards for StockGuard Enterprise.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Return to Dashboard
+            </a>
+        </div>
+
+        <div class="sg-card mb-4">
+            <div class="sg-card-header">
+                <h2 class="sg-card-title">
+                    <i class="bi bi-shield-check text-primary"></i>
+                    <span>Information Security Architecture</span>
+                </h2>
+            </div>
+            <div class="sg-card-body">
+                <h5 class="fw-bold text-dark mb-2">1. Credential Security & Password Hashing</h5>
+                <p class="text-muted mb-4">
+                    StockGuard enforces industry-standard cryptographic PBKDF2 hashing with unique salting for all user credentials. Passwords are never stored in plaintext and cannot be reverse-engineered from database repositories.
+                </p>
+
+                <h5 class="fw-bold text-dark mb-2">2. Role-Based Access Control (RBAC)</h5>
+                <p class="text-muted mb-4">
+                    All administrative operations (including catalog management, supplier editing, and category management) are protected with encrypted cookie authentication tickets and server-side authorization filters.
+                </p>
+
+                <h5 class="fw-bold text-dark mb-2">3. Audit Logging & Transaction Reversals</h5>
+                <p class="text-muted mb-0">
+                    Stock movements (inbound intake, outbound fulfillment, and audit adjustments) maintain referential integrity. Deletions automatically preserve transactional accounting invariants.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
